@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>수강신청</h2>
+
+    <div class="text-end">
+        <div class="fw-bold">서버시간</div>
+        <div id="serverTime" class="fs-4 text-danger"></div>
+    </div>
+</div>
+
+<button class="btn btn-primary" id="searchBtn">조회</button>
+</div>
+
+<table class="table table-bordered text-center align-middle mb-4">
+    <thead class="table-light">
+        <tr>
+            <th>기준학점</th>
+            <th>현재신청학점</th>
+            <th>신청가능학점</th>
+            <th>신청과목수</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>21</td>
+            <td>0</td>
+            <td>21</td>
+            <td>0</td>
+        </tr>
+    </tbody>
+</table>
+
+<h5 class="mb-3">개설강좌</h5>
+
+<div class="row mt-3 mb-3">
+    <div class="col">
+        <table class="table table-bordered text-center simulator-info">
+            <tr>
+                <th>기준학점</th>
+                <th>현재신청학점</th>
+                <th>신청가능학점</th>
+            </tr>
+            <tr>
+                <td>20</td>
+                <td id="currentCredit">0</td>
+                <td id="remainCredit">20</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<h5 class="mb-2">개설강좌</h5>
+
+<table class="table table-bordered table-hover text-center align-middle" id="courseTable">
+    <thead>
+        <tr>
+            <th>신청</th>
+            <th>과목명</th>
+            <th>교수</th>
+            <th>학점</th>
+            <th>요일</th>
+            <th>시간</th>
+        </tr>
+    </thead>
+
+    <tbody id="courseBody">
+
+    </tbody>
+
+</table>
+
+<h5 class="mt-5 mb-2">수강신청 내역</h5>
+
+<table class="table table-bordered text-center align-middle">
+    <thead>
+        <tr>
+            <th>과목명</th>
+            <th>교수</th>
+            <th>학점</th>
+            <th>요일</th>
+            <th>시간</th>
+        </tr>
+    </thead>
+
+    <tbody id="myCourseBody">
+
+    </tbody>
+
+</table>
+
+<tbody id="myCourseTable">
+    <tr>
+        <td colspan="5">신청한 과목이 없습니다.</td>
+    </tr>
+</tbody>
+</table>
+
+{% endblock %}

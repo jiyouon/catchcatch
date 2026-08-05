@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Course, GraduationRequirement
 
@@ -167,6 +167,30 @@ def check_graduation():
         }
     }), 200
 
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+@app.route('/mode-select')
+def mode_select():
+    return render_template('mode_select.html')
+
+@app.route('/simulator')
+def simulator():
+    return render_template('simulator.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
