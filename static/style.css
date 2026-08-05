@@ -1,0 +1,232 @@
+body {
+    background: #F7F8FC;
+    font-family: "Pretendard", "Noto Sans KR", sans-serif;
+    color: #333;
+}
+
+.main-navbar {
+    background: #6B6EB3;
+}
+
+.simulator-navbar {
+    background: #0D6B63;
+}
+
+.navbar-brand {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.nav-link {
+    font-size: 17px;
+}
+
+.container {
+    max-width: 1500px;
+    margin-top: 40px;
+}
+
+footer {
+    color: #777;
+}
+
+.auth-card {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 35px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #6B6EB3;
+    font-weight: bold;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #6B6EB3;
+    box-shadow: 0 0 0 .2rem rgba(107, 110, 179, .25);
+}
+
+.btn-primary {
+    background: #6B6EB3;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #582F82;
+}
+
+.btn-success {
+    background: #6B6EB3;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #582F82;
+}
+
+.mode-btn {
+    width: 180px;
+}
+
+.mode-btn-hard {
+    width: 180px;
+    background: #7A1F1F;
+    border: none;
+}
+
+.mode-btn-hard:hover {
+    background: #5A1414;
+}
+
+.card {
+    border: none;
+    border-radius: 16px;
+}
+
+.card-header {
+    background: #6B6EB3;
+    color: white;
+    font-weight: bold;
+}
+
+.menu-card {
+    transition: .2s;
+    cursor: pointer;
+}
+
+.menu-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+}
+
+.schedule-wrapper {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#scheduleTable {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.time-cell {
+    width: 120px;
+}
+
+.schedule-cell {
+    height: 60px;
+    background: #FAFAFA;
+    transition: .2s;
+}
+
+.schedule-cell:hover {
+    background: #EEF0FF;
+    cursor: pointer;
+}
+
+.progress {
+    height: 25px;
+}
+
+.progress-bar {
+    background: #6B6EB3;
+}
+
+#courseList {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+#serverTime {
+    font-weight: 700;
+    color: #D32F2F;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+.simulator-info {
+    font-size: 15px;
+}
+
+.simulator-info th {
+    background: #F3F4F6;
+    font-weight: 600;
+}
+
+.simulator-info td {
+    font-weight: 600;
+}
+
+#courseTable th {
+    background: #F3F4F6;
+    font-size: 14px;
+}
+
+#courseTable td {
+    font-size: 14px;
+}
+
+#courseTable button {
+    width: 70px;
+}
+
+#myCourseBody td {
+    height: 45px;
+}
+
+.simulator-title {
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.simulator-box {
+    background: white;
+    border: 1px solid #D9D9D9;
+    padding: 18px;
+}
+
+.simulator-search {
+    background: #F8F9FA;
+    border: 1px solid #D9D9D9;
+    padding: 12px;
+}
+
+.simulator-search select,
+.simulator-search input {
+    font-size: 14px;
+}
+
+.simulator-table th {
+    background: #F5F5F5;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.simulator-table td {
+    font-size: 13px;
+}
+
+.simulator-table tbody tr:hover {
+    background: #EEF8F6;
+}

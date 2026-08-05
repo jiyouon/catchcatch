@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-card">
+
+  <h2 class="page-title">회원가입</h2>
+
+  <!-- 에러메시지 -->
+  <div id="registerError" class="text-danger mb-3"></div>
+
+  <form id="registerForm" autocomplete="on">
+
+    <div class="mb-3">
+      <label class="form-label">아이디</label>
+      <input id="userId" type="text" class="form-control" placeholder="아이디">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">비밀번호</label>
+      <input id="password" type="password" class="form-control" placeholder="비밀번호" autocomplete="new-password">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">비밀번호 확인</label>
+      <input id="passwordCheck" type="password" class="form-control" placeholder="비밀번호를 다시 입력하세요">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">학번</label>
+      <input id="studentId" type="text" class="form-control" placeholder="20261234">
+    </div>
+
+    <div class="mb-3">
+
+      <label class="form-label">
+        학과
+      </label>
+
+      <select id="department" class="form-select">
+
+        <option>컴퓨터공학과</option>
+
+      </select>
+
+    </div>
+
+    <button class="btn btn-success w-100" type="submit">
+
+      회원가입
+
+    </button>
+
+  </form>
+
+  <hr>
+
+  <p class="text-center">
+
+    이미 계정이 있으신가요?
+
+    <a href="/login">
+
+      로그인
+
+    </a>
+
+  </p>
+
+</div>
+
+{% endblock %}
