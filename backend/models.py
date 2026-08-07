@@ -23,9 +23,27 @@ class Course(db.Model):
     professor = db.Column(db.String(50), nullable=True)
     credits = db.Column(db.Float, nullable=False, default=3.0)
     category = db.Column(db.String(50), nullable=True)
+    domain = db.Column(db.String(50), nullable=True)
     day = db.Column(db.String(10), nullable=True)
     start_time = db.Column(db.Integer, nullable=True)
     end_time = db.Column(db.Integer, nullable=True)
+
+
+class Enrollment(db.Model):
+    __tablename__ = 'enrollments'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.String(50), db.ForeignKey('users.user_id'), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.course_id'), nullable=False)
+    enrolled_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    user = db.relationship('User', backref=db.backref('enrollments', lazy='dynamic'))
+    course = db.relationship('Course', backref=db.backref('enrollments', lazy='dynamic'))
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'course_id', name='uq_user_course'),
+    )
+
 
 # 3. 세부 졸업요건 테이블 (졸업요건.xlsx 호환)
 class GraduationRequirement(db.Model):
