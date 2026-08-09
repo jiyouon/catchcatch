@@ -27,3 +27,7 @@ def dashboard():
     if not session.get('user_id'):
         return redirect('/login')
     return render_template('dashboard.html')
+
+@view_bp.route('/mypage')
+def mypage():
+    return render_template('mypage.html')

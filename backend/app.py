@@ -24,11 +24,12 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 db.init_app(app)
 
-# 💡 분리한 라우터들을 각각 등록
+# 분리한 라우터들 블루프린트 등록
 app.register_blueprint(auth_bp)
 app.register_blueprint(graduation_bp)
 app.register_blueprint(schedule_bp)
 app.register_blueprint(view_bp)
+
 
 with app.app_context():
     db.create_all()
