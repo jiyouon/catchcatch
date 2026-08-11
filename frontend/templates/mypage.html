@@ -13,8 +13,9 @@
                     <a href="/mypage" class="list-group-item list-group-item-action active">
                         내 정보
                     </a>
+                    <!-- <새로 작성> 클릭 시 졸업요건 진단 페이지(/graduation)로 이동 -->
                     <a href="/graduation" class="list-group-item list-group-item-action">
-                        졸업요건
+                        🎓 졸업요건 계산기
                     </a>
                 </div>
             </div>
@@ -28,16 +29,35 @@
                 <strong>내 정보</strong>
             </div>
             <div class="card-body">
-                <p class="mb-2">아이디</p>
-                <p id="myPageUserId" class="fw-bold">조회 중...</p>
+                <p class="mb-2 text-muted">아이디</p>
+                <p id="myPageUserId" class="fw-bold fs-5">조회 중...</p>
 
-                <p class="mb-2 mt-4">학번</p>
-                <p id="myPageStudentId" class="fw-bold">조회 중...</p>
+                <p class="mb-2 mt-4 text-muted">학번</p>
+                <p id="myPageStudentId" class="fw-bold fs-5">조회 중...</p>
 
-                <p class="mb-2 mt-4">학과</p>
-                <p id="myPageDepartment" class="fw-bold">조회 중...</p>
+                <p class="mb-2 mt-4 text-muted">학과</p>
+                <p id="myPageDepartment" class="fw-bold fs-5">조회 중...</p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch('/api/user/me');
+        const data = await res.json();
+        
+        if (res.ok && data.authenticated) {
+            document.getElementById('myPageUserId').textContent = data.user.user_id;
+            document.getElementById('myPageStudentId').textContent = data.user.student_id;
+            document.getElementById('myPageDepartment').textContent = data.user.department;
+        } else {
+            window.location.href = '/login';
+        }
+    } catch (err) {
+        console.error("유저 정보 조회 실패:", err);
+    }
+});
+</script>
 {% endblock %}

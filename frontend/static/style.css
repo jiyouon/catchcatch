@@ -230,3 +230,50 @@ footer {
 .simulator-table tbody tr:hover {
     background: #EEF8F6;
 }
+/* <새로 작성> 시간표 테이블 기본 스타일 */
+#scheduleTable {
+    table-layout: fixed;
+}
+
+#scheduleTable th, #scheduleTable td {
+    height: 48px;
+    vertical-align: middle;
+    padding: 2px;
+}
+
+.time-label {
+    background-color: #f8f9fa;
+    font-size: 0.85rem;
+}
+
+/* <새로 작성> 수업이 들어간 셀 전체 호버 애니메이션 스타일 */
+.schedule-cell.occupied-cell {
+    padding: 3px;
+    vertical-align: top;
+}
+
+.course-card {
+    background-color: #4a6cf7;
+    color: #ffffff;
+    height: 100%;
+    width: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* 개별 시/분 칸 반응이 아니라 통합된 큰 칸 전체가 반응하도록 설정 */
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 108, 247, 0.35) !important;
+    background-color: #3b5bdb;
+}
+
+.delete-course-btn {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.delete-course-btn:hover {
+    opacity: 1;
+}

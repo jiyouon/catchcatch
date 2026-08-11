@@ -97,3 +97,59 @@ def check_graduation():
             'remaining_career': max(0, req.req_career_credits - career_credits)
         }
     }), 200
+@graduation_bp.route('/gpa-calculator', methods=['POST'])
+def calculate_target_gpa():
+    """
+    [5단계] 목표 학점 산출 API
+    수신 데이터 (JSON):
+    - current_credits: 현재까지 이수한 학점 (예: 45)
+    - current_gpa: 현재 평균 평점 (예: 3.5)
+    - target_gpa: 최종 목표 평점 (예: 4.0)
+    - remaining_credits: 앞으로 들을 남은 학점 (예: 85)
+    """
+    data = request.get_json() or {}
+    
+    try:
+        current_credits = float(data.get('current_credits', 0))
+        current_gpa = float(data.get('current_gpa', 0.0))
+        target_gpa = float(data.get('target_gpa', 4.5))
+        remaining_credits = float(data.get('remaining_credits', 0))
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'message': '올바른 숫자 형식을 입력해주세요.'}), 400
+
+    if remaining_credits <= 0:
+        return jsonify({
+            'success': False, 
+            'message': '남은 학점이 0학점이하인 경우 계산할 수 없습니다.'
+        }), 400
+
+    total_credits = current_credits + remaining_credits
+    
+    # 필요 총 평점 점수 계산
+    required_total_points = target_gpa * total_credits
+    current_points = current_gpa * current_credits
+    needed_points = required_total_points - current_points
+    
+    # 남은 학점 동안 받아야 하는 최소 평균 평점
+    required_gpa = round(needed_points / remaining_credits, 2)
+    
+    # 4.5 만점 기준 달성 가능 여부 판단
+    is_possible = required_gpa <= 4.5
+    
+    warning_message = None
+    if required_gpa > 4.5:
+        warning_message = f"목표 평점({target_gpa})을 달성하려면 남은 학점 동안 평점 {required_gpa}점이 필요합니다. (만점 4.5 초과로 달성 불가)"
+    elif required_gpa < 0:
+        required_gpa = 0.0  # 이미 목표 평점을 초과 달성한 경우
+        warning_message = "이미 목표 평점을 달성하셨습니다!"
+
+    return jsonify({
+        'success': True,
+        'current_credits': current_credits,
+        'current_gpa': current_gpa,
+        'target_gpa': target_gpa,
+        'remaining_credits': remaining_credits,
+        'required_gpa': max(0.0, required_gpa),
+        'is_possible': is_possible,
+        'warning_message': warning_message
+    }), 200

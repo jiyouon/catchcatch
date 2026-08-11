@@ -39,6 +39,36 @@ def list_courses():
     }), 200
 
 
+# <새로 작성> [API] 내가 등록한 시간표 과목 목록 조회
+@schedule_bp.route('/my-schedule', methods=['GET'])
+def get_my_schedule():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': '로그인이 필요합니다.'}), 401
+
+    enrolled_courses = Course.query.join(Enrollment, Enrollment.course_id == Course.course_id)\
+        .filter(Enrollment.user_id == user_id).all()
+
+    return jsonify({
+        'success': True,
+        'courses': [
+            {
+                'course_id': c.course_id,
+                'code': c.code,
+                'title': c.title,
+                'professor': c.professor,
+                'credits': c.credits,
+                'category': c.category,
+                'domain': c.domain,
+                'day': c.day,
+                'start_time': c.start_time,
+                'end_time': c.end_time
+            }
+            for c in enrolled_courses
+        ]
+    }), 200
+
+
 @schedule_bp.route('/my-schedule/add', methods=['POST'])
 def add_course():
     user_id = session.get('user_id')
