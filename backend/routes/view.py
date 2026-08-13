@@ -1,6 +1,17 @@
 from flask import Blueprint, render_template, redirect, session
+from models import User
 
 view_bp = Blueprint('view', __name__)
+
+def is_authenticated():
+    user_id = session.get('user_id')
+    if not user_id:
+        return False
+    user = User.query.filter_by(user_id=user_id).first()
+    if not user:
+        session.clear()
+        return False
+    return True
 
 @view_bp.route('/')
 def home():
@@ -24,19 +35,18 @@ def simulator():
 
 @view_bp.route('/dashboard')
 def dashboard():
-    if not session.get('user_id'):
+    if not is_authenticated():
         return redirect('/login')
     return render_template('dashboard.html')
 
 @view_bp.route('/mypage')
 def mypage(): 
-    if not session.get('user_id'):
+    if not is_authenticated():
         return redirect('/login')
     return render_template('mypage.html')
 
-# <새로 작성> 졸업요건 계산기/판독 페이지 접근 라우트
 @view_bp.route('/graduation')
 def graduation():
-    if not session.get('user_id'):
+    if not is_authenticated():
         return redirect('/login')
     return render_template('graduation.html')

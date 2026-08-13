@@ -4,14 +4,12 @@ from models import db, User
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
-
 def is_valid_user_id(user_id):
     if not isinstance(user_id, str):
         return False
     if len(user_id) < 4 or len(user_id) > 20:
         return False
     return bool(__import__('re').match(r'^[A-Za-z0-9_]+$', user_id))
-
 
 def is_valid_password(password):
     if not isinstance(password, str):
@@ -23,11 +21,9 @@ def is_valid_password(password):
     categories = [any(ch.islower() for ch in password), any(ch.isupper() for ch in password), any(ch.isdigit() for ch in password), any(not ch.isalnum() for ch in password)]
     return sum(categories) >= 2
 
-
-# [API] 회원가입
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.get_json() or {}
     user_id = data.get('user_id')
     password = data.get('password')
     student_id = data.get('student_id')
@@ -63,19 +59,14 @@ def register():
 
     return jsonify({'success': True, 'message': '회원가입이 완료되었습니다!'}), 201
 
-
-# [API] 로그인
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.get_json() or {}
     user_id = data.get('user_id')
     password = data.get('password')
 
     if not user_id or not password:
         return jsonify({'success': False, 'message': '아이디와 비밀번호를 모두 입력해 주세요.'}), 400
-
-    if not is_valid_user_id(user_id):
-        return jsonify({'success': False, 'message': '아이디 형식이 올바르지 않습니다.'}), 400
 
     user = User.query.filter_by(user_id=user_id).first()
 
@@ -97,15 +88,11 @@ def login():
         }
     }), 200
 
-
-# [API] 로그아웃
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
     session.clear()
     return jsonify({'success': True, 'message': '로그아웃 되었습니다.'}), 200
 
-
-# [API] 내 정보 조회
 @auth_bp.route('/user/me', methods=['GET'])
 def get_me():
     user_id = session.get('user_id')
@@ -113,6 +100,10 @@ def get_me():
         return jsonify({'authenticated': False}), 401
     
     user = User.query.filter_by(user_id=user_id).first()
+    if not user:
+        session.clear()
+        return jsonify({'authenticated': False}), 401
+
     return jsonify({
         'authenticated': True,
         'user': {

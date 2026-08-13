@@ -1,44 +1,67 @@
+import os
+import sys
+
+# 상위 폴더(backend) 경로를 모듈 탐색 경로에 추가
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 import pandas as pd
-from flask import Flask
+from app import app
 from models import db, GraduationRequirement
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///catch_class.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def import_graduation_requirements():
+    # 엑셀 파일 위치 탐색 (utils 폴더 내부 or backend 폴더)
+    excel_path = os.path.join(current_dir, '졸업요건.xlsx')
+    if not os.path.exists(excel_path):
+        excel_path = os.path.join(parent_dir, '졸업요건.xlsx')
 
-db.init_app(app)
+    if not os.path.exists(excel_path):
+        print(f"❌ '졸업요건.xlsx' 파일을 찾을 수 없습니다! (경로 확인 필요)")
+        return
 
-def import_grad_requirements():
-    excel_path = r'C:\Users\jiyou\OneDrive\바탕 화면\catch\졸업요건.xlsx'
     df = pd.read_excel(excel_path)
-    
-    req_objects = []
-    for _, row in df.iterrows():
-        req = GraduationRequirement(
-            department=str(row['department']).strip(),
-            category=str(row['category']).strip() if not pd.isna(row['category']) else None,
-            entry_year=int(row['entry_year']) if 'entry_year' in row and not pd.isna(row['entry_year']) else 2026,
-            req_general_total=int(row['req_gen_total']),
-            req_sw_name=str(row['req_sw_code']) if not pd.isna(row['req_sw_code']) else None,
-            req_sw_credits=int(row['req_sw_credits']),
-            req_core_domains=int(row['req_core_domains']),
-            req_specified_core=str(row['req_core_specified']) if not pd.isna(row['req_core_specified']) else None,
-            req_career_credits=int(row['req_career_total']),
-            req_major_core=int(row['req_major_core']),
-            req_major_deep=int(row['req_major_deep']),
-            req_major_total=int(row['req_major_total']),
-            req_total_credits=int(row['req_total']),
-            has_thesis=bool(row['has_thesis'])
-        )
-        req_objects.append(req)
 
     with app.app_context():
-        db.create_all()
-        # 기존 졸업요건 데이터 초기화 후 43개 학과 데이터 삽입
+        # 기존 졸업요건 데이터 초기화
         GraduationRequirement.query.delete()
-        db.session.bulk_save_objects(req_objects)
+        
+        for _, row in df.iterrows():
+            dept = str(row['department']).strip()
+            cat = str(row['category']).strip() if pd.notna(row['category']) else ''
+            req_gen = int(row['req_gen_total']) if pd.notna(row['req_gen_total']) else 33
+            sw_code = str(row['req_sw_code']).strip() if pd.notna(row['req_sw_code']) else 'SW문해자율'
+            sw_credits = int(row['req_sw_credits']) if pd.notna(row['req_sw_credits']) else 3
+            core_domains = int(row['req_core_domains']) if pd.notna(row['req_core_domains']) else 4
+            core_spec = str(row['req_core_specified']).strip() if pd.notna(row['req_core_specified']) else ''
+            career = int(row['req_career_total']) if pd.notna(row['req_career_total']) else 3
+            major_core = int(row['req_major_core']) if pd.notna(row['req_major_core']) else 24
+            major_deep = int(row['req_major_deep']) if pd.notna(row['req_major_deep']) else 18
+            major_total = int(row['req_major_total']) if pd.notna(row['req_major_total']) else 42
+            req_total = int(row['req_total']) if pd.notna(row['req_total']) else 130
+            has_thesis = int(row['has_thesis']) if pd.notna(row['has_thesis']) else 0
+            entry_year = int(row['entry_year']) if pd.notna(row['entry_year']) else 2026
+
+            req = GraduationRequirement(
+                department=dept,
+                category=cat,
+                req_gen_total=req_gen,
+                req_sw_code=sw_code,
+                req_sw_credits=sw_credits,
+                req_core_domains=core_domains,
+                req_core_specified=core_spec,
+                req_career_total=career,
+                req_major_core=major_core,
+                req_major_deep=major_deep,
+                req_major_total=major_total,
+                req_total_credits=req_total,
+                has_thesis=has_thesis,
+                entry_year=entry_year
+            )
+            db.session.add(req)
+            
         db.session.commit()
-        print(f"🎉 성공! '졸업요건.xlsx'의 총 {len(req_objects)}개 학과 데이터가 DB(graduation.db)에 생성되었습니다!")
+        print("✅ 졸업요건 엑셀 데이터가 DB에 성공적으로 저장되었습니다!")
 
 if __name__ == '__main__':
-    import_grad_requirements()
+    import_graduation_requirements()
