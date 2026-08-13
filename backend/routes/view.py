@@ -25,13 +25,13 @@ def login_page():
 def register_page():
     return render_template('register.html')
 
-@view_bp.route('/mode-select')
-def mode_select():
-    return render_template('mode_select.html')
-
 @view_bp.route('/simulator')
 def simulator():
     return render_template('simulator.html')
+
+@view_bp.route('/mode-select')
+def mode_select():
+    return redirect('/simulator')
 
 @view_bp.route('/dashboard')
 def dashboard():

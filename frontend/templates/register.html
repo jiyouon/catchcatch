@@ -1,77 +1,131 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">CatchCatch 회원가입</h3>
+                    <p class="text-muted small">학번과 학과를 선택하고 맞춤형 졸업요건을 케어받으세요.</p>
+                </div>
 
-<div class="auth-card">
+                <form id="registerForm">
+                    <!-- 아이디 -->
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label fw-semibold">아이디</label>
+                        <input type="text" class="form-control" id="user_id" placeholder="4~20자 영문, 숫자, 밑줄(_)" required>
+                    </div>
 
-  <h2 class="page-title">회원가입</h2>
+                    <!-- 비밀번호 -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-semibold">비밀번호</label>
+                        <input type="password" class="form-control" id="password" placeholder="8~32자 (영문/숫자/특수문자 2종 이상)" required>
+                    </div>
 
-  <!-- 에러메시지 -->
-  <div id="registerError" class="text-danger mb-3"></div>
+                    <!-- 비밀번호 확인 -->
+                    <div class="mb-3">
+                        <label for="password_confirm" class="form-label fw-semibold">비밀번호 확인</label>
+                        <input type="password" class="form-control" id="password_confirm" placeholder="비밀번호 재입력" required>
+                    </div>
 
-  <form id="registerForm" autocomplete="on">
+                    <!-- 학번 -->
+                    <div class="mb-3">
+                        <label for="student_id" class="form-label fw-semibold">학번</label>
+                        <input type="text" class="form-control" id="student_id" placeholder="예: 20261234 (8~20자리 숫자)" required>
+                    </div>
 
-    <div class="mb-3">
-      <label class="form-label">아이디</label>
-      <input id="userId" type="text" class="form-control" placeholder="아이디" required>
-      <div class="form-text">아이디는 4~20자, 영문/숫자/밑줄(_)만 허용됩니다.</div>
+                    <!-- 학과 선택 (전체 학과 수록) -->
+                    <div class="mb-4">
+                        <label for="department" class="form-label fw-semibold">학과 선택</label>
+                        <select class="form-select" id="department" required>
+                            <option value="" selected disabled>-- 소속 학과를 선택해 주세요 --</option>
+                            
+                            <optgroup label="IT융합계열">
+                                <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                <option value="AI융합학부">AI융합학부</option>
+                                <option value="수리통계데이터사이언스학부">수리통계데이터사이언스학부</option>
+                                <option value="서비스디자인공학과">서비스디자인공학과</option>
+                                <option value="융합보안공학과">융합보안공학과</option>
+                            </optgroup>
+
+                            <optgroup label="인문융합계열">
+                                <option value="국어국문학과">국어국문학과</option>
+                                <option value="영어영문학과">영어영문학과</option>
+                                <option value="독일어문·문화학과">독일어문·문화학과</option>
+                                <option value="프랑스어문·문화학과">프랑스어문·문화학과</option>
+                                <option value="일본어문·문화학과">일본어문·문화학과</option>
+                                <option value="중국어문·문화학과">중국어문·문화학과</option>
+                                <option value="사학과">사학과</option>
+                                <option value="문화예술경영학과">문화예술경영학과</option>
+                                <option value="미디어영상연기학과">미디어영상연기학과</option>
+                                <option value="현대실용음악학과">현대실용음악학과</option>
+                                <option value="무용예술학과">무용예술학과</option>
+                            </optgroup>
+
+                            <optgroup label="사회과학계열">
+                                <option value="경영학과">경영학과</option>
+                                <option value="정치외교학과">정치외교학과</option>
+                                <option value="심리학과">심리학과</option>
+                                <option value="지리학과">지리학과</option>
+                                <option value="경제학과">경제학과</option>
+                                <option value="미디어커뮤니케이션학과">미디어커뮤니케이션학과</option>
+                                <option value="법학부">법학부</option>
+                            </optgroup>
+
+                            <optgroup label="자연/공학계열">
+                                <option value="화학·에너지융합학부">화학·에너지융합학부</option>
+                                <option value="바이오식품공학과">바이오식품공학과</option>
+                                <option value="청정신소재공학과">청정신소재공학과</option>
+                                <option value="바이오헬스융합학부">바이오헬스융합학부</option>
+                                <option value="바이오신약의과학부">바이오신약의과학부</option>
+                            </optgroup>
+
+                            <optgroup label="사범대학">
+                                <option value="교육학과">교육학과</option>
+                                <option value="국어교육과">국어교육과</option>
+                                <option value="유아교육과">유아교육과</option>
+                                <option value="사회교육과">사회교육과</option>
+                                <option value="윤리교육과">윤리교육과</option>
+                                <option value="한문교육과">한문교육과</option>
+                            </optgroup>
+
+                            <optgroup label="생활산업대학">
+                                <option value="의류산업학과">의류산업학과</option>
+                                <option value="소비자산업학과">소비자산업학과</option>
+                                <option value="뷰티산업학과">뷰티산업학과</option>
+                                <option value="스포츠과학부">스포츠과학부</option>
+                            </optgroup>
+
+                            <optgroup label="간호대학">
+                                <option value="간호학과">간호학과</option>
+                            </optgroup>
+
+                            <optgroup label="미술/음악대학">
+                                <option value="동양화과">동양화과</option>
+                                <option value="서양화과">서양화과</option>
+                                <option value="조소과">조소과</option>
+                                <option value="공예과">공예과</option>
+                                <option value="디자인과">디자인과</option>
+                                <option value="성악과">성악과</option>
+                                <option value="기악과">기악과</option>
+                                <option value="작곡과">작곡과</option>
+                            </optgroup>
+
+                            <optgroup label="창의융합">
+                                <option value="국제학부">국제학부</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold">가입하기</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">이미 계정이 있으신가요? <a href="/login" class="text-primary text-decoration-none fw-bold">로그인</a></small>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-      <label class="form-label">비밀번호</label>
-      <input id="password" type="password" class="form-control" placeholder="비밀번호" autocomplete="new-password" required>
-      <div class="form-text">비밀번호는 8~32자, 영문/숫자/특수문자 중 2가지 이상을 포함해야 합니다.</div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">비밀번호 확인</label>
-      <input id="passwordCheck" type="password" class="form-control" placeholder="비밀번호를 다시 입력하세요" required>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">학번</label>
-      <input id="studentId" type="text" class="form-control" placeholder="20261234" required>
-      <div class="form-text">학번은 숫자 8~20자리로 입력해주세요.</div>
-    </div>
-
-    <div class="mb-3">
-
-      <label class="form-label">
-        학과
-      </label>
-
-      <select id="department" class="form-select" required>
-
-        <option value="">선택</option>
-
-        <option>컴퓨터공학과</option>
-
-      </select>
-
-    </div>
-
-    <button class="btn btn-success w-100" type="submit">
-
-      회원가입
-
-    </button>
-
-  </form>
-
-  <hr>
-
-  <p class="text-center">
-
-    이미 계정이 있으신가요?
-
-    <a href="/login">
-
-      로그인
-
-    </a>
-
-  </p>
-
 </div>
-
 {% endblock %}

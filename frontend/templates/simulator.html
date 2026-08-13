@@ -1,101 +1,291 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="sungshin-portal-wrapper border rounded-3 bg-white shadow-sm overflow-hidden mb-5 style-portal">
+    <!-- [1] 포털 상단 헤더 (시작 시간 설정 기능 탑재) -->
+    <div class="sungshin-header bg-teal text-white p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-bold fs-5">🎓 성신여자대학교 수강신청 시스템</span>
+            <span class="badge bg-light text-dark fw-normal">수강신청 시뮬레이터</span>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3 small flex-wrap">
+            <!-- [신규] 수강신청 시작 시간 설정 컨트롤러 -->
+            <div class="d-flex align-items-center bg-white text-dark px-2 py-1 rounded gap-1 shadow-sm">
+                <span class="fw-bold" style="font-size:0.75rem;">⚙️ 오픈시간:</span>
+                <input type="time" id="targetOpenTimeInput" class="form-control form-control-sm py-0 px-1 border-0" value="10:00" style="width: 85px; font-size:0.8rem; font-weight:bold;">
+                <button class="btn btn-sm btn-dark py-0 px-2" id="applyOpenTimeBtn" style="font-size:0.75rem;">적용</button>
+            </div>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>수강신청</h2>
+            <!-- 0.1초 단위 서버 타임 전광판 -->
+            <div class="server-clock-box bg-black text-warning px-3 py-1 rounded fw-bold font-monospace border border-warning fs-6">
+                ⏱️ 서버타임: <span id="serverTime">09:59:55.0</span>
+            </div>
+            <span>{{ session.get('user_id', '수정이') }}님</span>
+            <a href="/dashboard" class="btn btn-sm btn-light py-0 fw-semibold">대시보드</a>
+        </div>
+    </div>
 
-    <div class="text-end">
-        <div class="fw-bold">서버시간</div>
-        <div id="serverTime" class="fs-4 text-danger"></div>
+    <!-- [2] 본문 영역 (좌측 메뉴 + 우측 메인 포털) -->
+    <div class="row g-0">
+        <!-- 좌측 사이드바 메뉴 -->
+        <div class="col-md-2 border-end bg-light p-3 sidebar-menu">
+            <div class="list-group list-group-flush small fw-semibold">
+                <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 py-2 text-secondary">수강신청일정 ›</a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 py-2 text-secondary">수강신청안내 ›</a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 py-2 text-secondary">교양수강안내 ›</a>
+                <a href="javascript:void(0)" class="list-group-item list-group-item-action bg-transparent border-0 py-2 text-secondary" id="tabFavMenu">관심강좌 신청 ›</a>
+                <a href="javascript:void(0)" class="list-group-item list-group-item-action bg-transparent border-0 py-2 text-primary fw-bold active-menu" id="tabApplyMenu">수강신청 ›</a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 py-2 text-secondary">강의시간표조회 ›</a>
+            </div>
+
+            <!-- 난이도 설정 모드 스위치 -->
+            <div class="mt-4 p-3 bg-white border rounded shadow-sm">
+                <label class="form-label fw-bold text-dark small mb-2">🔥 난이도 설정 (Mode)</label>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="difficultyToggle">
+                    <label class="form-check-input-label small fw-semibold text-success" for="difficultyToggle" id="modeLabel">
+                        쉬움 (Easy)
+                    </label>
+                </div>
+                <small class="text-muted style-small" style="font-size:0.75rem;" id="modeDesc">
+                    * 클릭 즉시 신청 성공 모드입니다.
+                </small>
+            </div>
+        </div>
+
+        <!-- 우측 메인 포털 화면 (뷰 전환 영역) -->
+        <div class="col-md-10 p-3 bg-white">
+            
+            <!-- [화면 A] 수강신청 화면 (메인 뷰) -->
+            <div id="viewApplyPage">
+                <div class="fw-bold text-dark mb-2 d-flex align-items-center gap-1 fs-6">
+                    <span>🔖 수강신청</span>
+                </div>
+
+                <!-- 검색 필터 바 -->
+                <div class="border p-2 bg-white rounded mb-3 style-small" style="font-size: 0.82rem;">
+                    <div class="text-center text-danger fw-bold mb-2" id="statusMessage">
+                        [수강신청 기간이 아닙니다.]
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                        <div class="d-flex align-items-center gap-1">
+                            <label class="fw-bold">과목</label>
+                            <select class="form-select form-select-sm py-0" id="simCategorySelect" style="width: 130px; font-size: 0.78rem;">
+                                <option value="관심강좌" selected>관심강좌</option>
+                                <option value="주전공">주전공</option>
+                                <option value="부·복수전공">부·복수전공</option>
+                                <option value="교양">교양</option>
+                                <option value="교직">교직</option>
+                                <option value="사이버">사이버</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <label class="fw-bold">검색</label>
+                            <input type="text" id="simCourseSearch" class="form-control form-control-sm py-0" placeholder="과목명 또는 학수번호" style="width: 180px; font-size: 0.78rem;">
+                            <button class="btn btn-sm btn-teal py-0 px-2 fw-bold" id="simSearchBtn" style="font-size: 0.78rem;">조회</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 현황 대시보드 뱃지 바 -->
+                <div class="d-flex align-items-center gap-3 mb-2 style-small flex-wrap" style="font-size: 0.78rem;">
+                    <div><span class="fw-bold">개설강좌</span></div>
+                    <div>기준학점(최소/최대) <span class="badge bg-light text-dark border">1</span> <span class="badge bg-light text-dark border">20</span></div>
+                    <div>현재신청학점 <span class="badge bg-danger text-white" id="badgeCurrentCredits">0</span></div>
+                    <div>학점교류 <span class="badge bg-light text-dark border">0</span></div>
+                    <div>재수강과목(최대/신청) <span class="badge bg-light text-dark border">2</span> <span class="badge bg-light text-dark border">0</span></div>
+                    <div class="ms-auto text-muted">[<span id="searchCount">0</span>]</div>
+                </div>
+
+                <!-- 개설강좌 테이블 -->
+                <div class="table-responsive border mb-4" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-bordered text-center align-middle portal-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;">No</th>
+                                <th style="width:50px;">수강신청</th>
+                                <th>개설학과전공</th>
+                                <th>학수번호</th>
+                                <th>교과목명</th>
+                                <th>분반</th>
+                                <th>이수구분</th>
+                                <th>영역</th>
+                                <th>교과세부</th>
+                                <th>학점/이론/실습</th>
+                                <th>수강정원</th>
+                                <th>수강인원</th>
+                                <th>요일/교시</th>
+                                <th>담당교수</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchedCourseBody">
+                            <tr>
+                                <td colspan="14" class="text-muted py-4">담아둔 관심강좌가 없습니다. '관심강좌 신청' 메뉴에서 미리 과목을 담아보세요.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 수강강좌 내역 -->
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="text-dark small">수강강좌 내역</strong>
+                    <span class="text-muted style-small" style="font-size: 0.75rem;">[ <span id="enrolledCount">0</span> ]</span>
+                </div>
+                <div class="table-responsive border" style="max-height: 200px; overflow-y: auto;">
+                    <table class="table table-bordered text-center align-middle portal-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;">No</th>
+                                <th style="width:50px;">취소</th>
+                                <th>개설학과전공</th>
+                                <th>학수번호</th>
+                                <th>교과목명</th>
+                                <th>분반</th>
+                                <th>이수구분</th>
+                                <th>영역</th>
+                                <th>교과세부</th>
+                                <th>학점/이론/실습</th>
+                                <th>수강정원</th>
+                                <th>수강인원</th>
+                                <th>요일/교시</th>
+                                <th>담당교수</th>
+                                <th>수강구분</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enrolledCourseBody">
+                            <tr>
+                                <td colspan="15" class="text-muted py-3">신청된 수강 강좌가 없습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- [화면 B] 관심강좌 신청 화면 (담기 전용 뷰) -->
+            <div id="viewFavPage" class="d-none">
+                <div class="fw-bold text-dark mb-2 d-flex align-items-center gap-1 fs-6">
+                    <span>🔖 관심강좌신청</span>
+                </div>
+
+                <div class="border p-2 bg-white rounded mb-3 style-small" style="font-size: 0.82rem;">
+                    <div class="text-center text-primary fw-bold mb-2">
+                        [관심강좌 등록 기간입니다.]
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                        <div class="d-flex align-items-center gap-1">
+                            <label class="fw-bold">검색</label>
+                            <input type="text" id="favCourseSearchInput" class="form-control form-control-sm py-0" placeholder="과목명 또는 학수번호" style="width: 220px; font-size: 0.78rem;">
+                            <button class="btn btn-sm btn-teal py-0 px-2 fw-bold" id="favSearchBtn" style="font-size: 0.78rem;">조회</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="text-dark small">개설강좌 (관심강좌로 담기)</strong>
+                </div>
+                <div class="table-responsive border mb-4" style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-bordered text-center align-middle portal-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;">No</th>
+                                <th style="width:70px;">관심담기</th>
+                                <th>개설학과전공</th>
+                                <th>학수번호</th>
+                                <th>교과목명</th>
+                                <th>이수구분</th>
+                                <th>학점</th>
+                                <th>요일/교시</th>
+                                <th>담당교수</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allCourseForFavBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong class="text-dark small">관심강좌신청내역</strong>
+                    <span class="text-muted style-small" style="font-size: 0.75rem;">관심강좌(가능/신청): [ 30 / <span id="myFavCount">0</span> ]</span>
+                </div>
+                <div class="table-responsive border" style="max-height: 220px; overflow-y: auto;">
+                    <table class="table table-bordered text-center align-middle portal-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;">No</th>
+                                <th style="width:50px;">취소</th>
+                                <th>개설학과전공</th>
+                                <th>학수번호</th>
+                                <th>교과목명</th>
+                                <th>분반</th>
+                                <th>이수구분</th>
+                                <th>학점</th>
+                                <th>요일/교시</th>
+                                <th>담당교수</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myFavCourseBody">
+                            <tr>
+                                <td colspan="10" class="text-muted py-3">담아둔 관심강좌가 없습니다. 상단 강좌에서 관심담기를 클릭하세요.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-<button class="btn btn-primary" id="searchBtn">조회</button>
-</div>
+<!-- 대기열 레이어 팝업 -->
+<div class="modal fade" id="waitingQueueModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content border-secondary shadow-lg rounded-0">
+            <div class="modal-body p-4 bg-light text-dark position-relative style-small" style="font-size: 0.85rem;">
+                <div class="fw-bold fs-6 mb-3 text-dark">서비스 접속대기 중입니다.</div>
+                <div class="text-end fw-semibold mb-2">예상대기시간 : <span id="queueTime" class="text-danger">02</span>초</div>
+                
+                <div class="progress rounded-0 mb-3" style="height: 16px; background-color: #d1d5db;">
+                    <div id="queueProgressBar" class="progress-bar bg-teal" style="width: 100%"></div>
+                </div>
 
-<table class="table table-bordered text-center align-middle mb-4">
-    <thead class="table-light">
-        <tr>
-            <th>기준학점</th>
-            <th>현재신청학점</th>
-            <th>신청가능학점</th>
-            <th>신청과목수</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>21</td>
-            <td>0</td>
-            <td>21</td>
-            <td>0</td>
-        </tr>
-    </tbody>
-</table>
-
-<h5 class="mb-3">개설강좌</h5>
-
-<div class="row mt-3 mb-3">
-    <div class="col">
-        <table class="table table-bordered text-center simulator-info">
-            <tr>
-                <th>기준학점</th>
-                <th>현재신청학점</th>
-                <th>신청가능학점</th>
-            </tr>
-            <tr>
-                <td>20</td>
-                <td id="currentCredit">0</td>
-                <td id="remainCredit">20</td>
-            </tr>
-        </table>
+                <div class="p-2 border bg-white mb-2 style-small" style="font-size: 0.78rem; line-height: 1.5;">
+                    고객님 앞에 <strong id="queueFront" class="text-primary">2774</strong> 명, 뒤에 <strong id="queueBack">1</strong> 명의 대기자가 있습니다.<br>
+                    현재 접속 사용자가 많아 대기 중이며, 잠시만 기다리시면 서비스로 자동 접속 됩니다.
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<h5 class="mb-2">개설강좌</h5>
+<!-- 알림 모달 -->
+<div class="modal fade" id="portalAlertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+        <div class="modal-content rounded-0 border-0 shadow">
+            <div class="modal-header bg-teal text-white py-1 px-3 rounded-0">
+                <span class="modal-title fw-bold small">알림!</span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="font-size:0.7rem;"></button>
+            </div>
+            <div class="modal-body p-4 text-center bg-light">
+                <p class="mb-3 text-dark fw-semibold small" id="alertModalMessage">과목이 처리되었습니다.</p>
+                <button type="button" class="btn btn-teal btn-sm px-4 rounded-0 style-small" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<table class="table table-bordered table-hover text-center align-middle" id="courseTable">
-    <thead>
-        <tr>
-            <th>신청</th>
-            <th>과목명</th>
-            <th>교수</th>
-            <th>학점</th>
-            <th>요일</th>
-            <th>시간</th>
-        </tr>
-    </thead>
+<style>
+.bg-teal { background-color: #1a7576 !important; }
+.btn-teal { background-color: #1a7576; color: white; border: none; }
+.btn-teal:hover { background-color: #135859; color: white; }
 
-    <tbody id="courseBody">
+.btn-portal-apply { background-color: #1a7576; color: white; border: none; font-size: 0.72rem; padding: 2px 6px; border-radius: 0; }
+.btn-portal-apply:hover { background-color: #135859; color: white; }
 
-    </tbody>
+.btn-portal-cancel { background-color: #1a7576; color: white; border: none; font-size: 0.72rem; padding: 2px 6px; border-radius: 0; }
+.btn-portal-cancel:hover { background-color: #a82a2a; color: white; }
 
-</table>
-
-<h5 class="mt-5 mb-2">수강신청 내역</h5>
-
-<table class="table table-bordered text-center align-middle">
-    <thead>
-        <tr>
-            <th>과목명</th>
-            <th>교수</th>
-            <th>학점</th>
-            <th>요일</th>
-            <th>시간</th>
-        </tr>
-    </thead>
-
-    <tbody id="myCourseBody">
-
-    </tbody>
-
-</table>
-
-<tbody id="myCourseTable">
-    <tr>
-        <td colspan="5">신청한 과목이 없습니다.</td>
-    </tr>
-</tbody>
-</table>
-
+.portal-table th, .portal-table td { font-size: 0.75rem; padding: 3px 5px; white-space: nowrap; border-color: #dee2e6; }
+.portal-table thead th { background-color: #f1f3f5; font-weight: 600; color: #333; }
+.active-menu { background-color: #e6f4ea !important; border-left: 4px solid #1a7576 !important; }
+</style>
 {% endblock %}

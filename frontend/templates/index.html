@@ -11,45 +11,55 @@
         수강신청 시뮬레이터 & 졸업요건 관리 시스템
     </p>
     <hr class="my-5">
+
     <div class="row g-4">
+        <!-- 시간표 -->
         <div class="col-md-4">
             <a href="/dashboard" class="text-decoration-none text-dark">
-                <div class="card h-100 menu-card">
+                <div class="card h-100 menu-card shadow-sm">
                     <div class="card-body">
-                        <h4>시간표</h4>
-                        <p class="text-muted">
-                            시간표를 작성하고 관리합니다.
+                        <h4>🗓️ 시간표</h4>
+                        <p class="text-muted small">
+                            시간표를 작성하고 Care System 알림을 확인합니다.
                         </p>
                     </div>
                 </div>
             </a>
         </div>
 
-        <div class="col-md-4">
-            <a href="/mode-select" class="text-decoration-none text-dark">
-                <div class="card h-100 menu-card">
-                    <div class="card-body text-center">
-                        <h4>수강신청 연습</h4>
-                        <p class="text-muted">
-                            실제처럼 수강신청을 연습합니다.
-                        </p>
-                    </div>
+    <!-- 수강신청 연습 카드 영역 -->
+    <div class="col-md-4">
+        <a href="/simulator" class="text-decoration-none text-dark">
+            <div class="card h-100 menu-card shadow-sm">
+                <div class="card-body text-center">
+                    <h4>⚡ 수강신청 연습</h4>
+                    <p class="text-muted small">
+                        서버 시계와 대기열로 실제 성신여대 수강신청을 연습합니다.
+                    </p>
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
+    </div>
+
+        <!-- 졸업요건  -->
         <div class="col-md-4">
-            <a href="/login" class="text-decoration-none text-dark">
-                <div class="card h-100 menu-card">
+            <a href="/graduation" class="text-decoration-none text-dark">
+                <div class="card h-100 menu-card shadow-sm">
                     <div class="card-body">
-                        <h4>졸업요건</h4>
-                        <p class="text-muted">
-                            로그인 후 이용 가능합니다.
+                        <h4>🎓 졸업요건</h4>
+                        <p class="text-muted small">
+                            {% if session.get('user_id') %}
+                                내 학과 기준 이수 현황 및 졸업요건을 진단합니다.
+                            {% else %}
+                                로그인 후 이용 가능합니다.
+                            {% endif %}
                         </p>
                     </div>
                 </div>
             </a>
         </div>
     </div>
+
 </div>
 
 {% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- 상단 대시보드 헤더 및 퀵 링크 버튼 -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h4 class="fw-bold mb-1">🎓 내 학과 졸업요건 실시간 진단</h4>
+                    <p class="text-muted small mb-0">현재 등록된 시간표 기준으로 산출된 실시간 졸업 진단 결과입니다.</p>
+                </div>
+                <!-- 개설강의 보러가기 / 전체 졸업요건 안내 모달 버튼 -->
+                <div class="d-flex gap-2">
+                    <a href="/dashboard" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                        🔍 개설 강의 확인 및 시간표 추가
+                    </a>
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#allGradRequirementsModal">
+                        📋 전체 학과 졸업요건 안내표
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 좌측: 학점 게이지 바 현황 -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <strong class="fs-6">📊 이수 학점 충족률</strong>
+                <span id="graduationStatus" class="badge bg-secondary fs-6">확인 중</span>
+            </div>
+            <div class="card-body">
+                <!-- 총 학점 -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-semibold small">총 학점</span>
+                        <span id="totalProgressText" class="text-primary fw-bold small">0 / 0학점 (0%)</span>
+                    </div>
+                    <div class="progress" style="height: 22px;">
+                        <div id="totalProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 0%">0%</div>
+                    </div>
+                </div>
+
+                <!-- 전공 학점 -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-semibold small">주전공 학점</span>
+                        <span id="majorProgressText" class="text-success fw-bold small">0 / 0학점 (0%)</span>
+                    </div>
+                    <div class="progress" style="height: 22px;">
+                        <div id="majorProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%">0%</div>
+                    </div>
+                </div>
+
+                <!-- 교양 학점 -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-semibold small">교양 학점</span>
+                        <span id="generalProgressText" class="text-info fw-bold small">0 / 0학점 (0%)</span>
+                    </div>
+                    <div class="progress" style="height: 22px;">
+                        <div id="generalProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 0%">0%</div>
+                    </div>
+                </div>
+
+                <!-- 진로소양 학점 -->
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-semibold small">진로소양 학점</span>
+                        <span id="careerProgressText" class="text-warning fw-bold small">0 / 0학점 (0%)</span>
+                    </div>
+                    <div class="progress" style="height: 22px;">
+                        <div id="careerProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning text-dark" style="width: 0%">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 우측: 학과별 세부 필수 조건 판독 -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white py-3 border-0">
+                <strong class="fs-6">📌 필수 지정 교양 및 핵심 영역</strong>
+            </div>
+            <div class="card-body">
+                <!-- SW 필수 교양 -->
+                <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <div class="fw-bold small text-dark mb-1">💻 SW 필수 영역</div>
+                    <div id="swRequirement" class="small text-muted">확인 중</div>
+                </div>
+
+                <!-- 핵심교양 및 학과 지정과목 -->
+                <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <div class="fw-bold small text-dark mb-1">🌐 핵심교양 영역 & 지정 교양</div>
+                    <div id="coreDomainRequirement" class="small text-muted">확인 중</div>
+                </div>
+
+                <!-- 진단 경고 목록 -->
+                <div class="p-3 bg-light rounded-3 border">
+                    <div class="fw-bold small text-dark mb-2">⚠️ 졸업요건 미충족 항목</div>
+                    <div id="graduationWarnings" class="small">확인 중</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 모달: 전체 학과 졸업요건 종합 가이드 팝업 -->
+<div class="modal fade" id="allGradRequirementsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalLabel">📋 전체 학과별 졸업요건 종합 가이드</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered text-center align-middle style-small" style="font-size:0.85rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>계열</th>
+                                <th>학과(전공)</th>
+                                <th>총 학점</th>
+                                <th>전공</th>
+                                <th>교양</th>
+                                <th>SW 필수</th>
+                                <th>핵심교양 필수 지정</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">IT융합</td>
+                                <td>컴퓨터/AI/수통데/서디공/융보공</td>
+                                <td>130</td>
+                                <td>42</td>
+                                <td>33</td>
+                                <td>파이썬프로그래밍</td>
+                                <td>경험적·수리적추리 (기초통계학/미적분과벡터해석기초)</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">자연/공대</td>
+                                <td>화학·에너지/바이오식품/청정신소재/바이오헬스/바이오신약</td>
+                                <td>130</td>
+                                <td>42</td>
+                                <td>32~33</td>
+                                <td>SW문해자율</td>
+                                <td>자연의설명 (일반화학I,II / 일반생물학 / 미적분벡터)</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">사범대학</td>
+                                <td>교육/국어교육/유아교육/사회교육/윤리교육/한문교육</td>
+                                <td>130</td>
+                                <td>50</td>
+                                <td>27</td>
+                                <td>AI·디지털리터러시 교육의 이해</td>
+                                <td>핵심교양 4개 영역 자유 이수</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">인문/사회</td>
+                                <td>국문/영문/독문/불어/일문/중문/사학/경영/정외/심리/지리/경제/미디어 등</td>
+                                <td>130</td>
+                                <td>42</td>
+                                <td>33</td>
+                                <td>SW문해자율</td>
+                                <td>핵심교양 4개 영역 자유 이수</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">미술/음악</td>
+                                <td>동양화/서양화/조소/공예/디자인/성악/기악/작곡</td>
+                                <td>130</td>
+                                <td>42</td>
+                                <td>30~33</td>
+                                <td>SW문해자율</td>
+                                <td>핵심교양 3~4개 영역 자유 이수</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">간호/국제</td>
+                                <td>간호학과 / 국제학부</td>
+                                <td>120~130</td>
+                                <td>63~102</td>
+                                <td>25~30</td>
+                                <td>SW문해 / 없음</td>
+                                <td>핵심교양 0~3개 영역</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

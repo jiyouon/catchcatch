@@ -277,3 +277,15 @@ footer {
 .delete-course-btn:hover {
     opacity: 1;
 }
+.course-card, 
+.course-card.bg-primary {
+    background-color: #5d7294 !important; 
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.course-card:hover {
+    background-color: #4c5f7d !important; 
+}
